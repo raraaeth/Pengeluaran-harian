@@ -142,6 +142,11 @@ tr.keluar{
 
 <select id="tahunFilter"></select>
 
+<select id="kategoriFilter">
+    <option value="">
+        Semua Kategori
+    </option>
+</select>
 </div>
 
 <div class="cards">
@@ -301,6 +306,28 @@ function isiFilter(){
         `;
 
     });
+    const kategoriSelect =
+    document.getElementById(
+        'kategoriFilter'
+    );
+
+const kategoriSet =
+    [...new Set(
+        semuaData.map(
+            x => x.Kategori.trim()
+        )
+    )]
+    .sort();
+
+kategoriSet.forEach(k => {
+
+    kategoriSelect.innerHTML += `
+    <option value="${k}">
+        ${k}
+    </option>
+    `;
+
+});
 
     const sekarang = new Date();
 
@@ -319,6 +346,10 @@ function isiFilter(){
         'change',
         render
     );
+    kategoriSelect.addEventListener(
+    'change',
+    render
+);
 
 }
 
@@ -338,9 +369,35 @@ function render(){
             ).value
         );
 
-    const data =
-        semuaData.filter(item => {
+    const kategoriDipilih =
+    document.getElementById(
+        'kategoriFilter'
+    ).value;
 
+const data =
+    semuaData.filter(item => {
+
+        const t =
+            new Date(item.Tanggal);
+
+        const cocokBulan =
+            t.getMonth()+1 === bulan;
+
+        const cocokTahun =
+            t.getFullYear() === tahun;
+
+        const cocokKategori =
+            !kategoriDipilih ||
+            item.Kategori.trim() ===
+            kategoriDipilih;
+
+        return (
+            cocokBulan &&
+            cocokTahun &&
+            cocokKategori
+        );
+
+    });
             const t =
                 new Date(item.Tanggal);
 
