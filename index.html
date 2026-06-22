@@ -226,19 +226,282 @@ function rupiah(n){
     return 'Rp' + Number(n).toLocaleString('id-ID');
 }
 
+let semuaData = [];
+
+const bulanNama = [
+    'Januari',
+    'Februari',
+    'Maret',
+    'April',
+    'Mei',
+    'Juni',
+    'Juli',
+    'Agustus',
+    'September',
+    'Oktober',
+    'November',
+    'Desember'
+];
+
 fetch(DATA_URL)
 .then(res => res.json())
 .then(data => {
 
-    console.log(data);
+    semuaData = data;
 
-    document.getElementById('kategoriList')
-        .innerHTML =
-        `Jumlah transaksi: ${data.length}`;
+    isiFilter();
+
+    render();
 
 });
 
-</script>
+function isiFilter(){
 
+    const bulanSelect =
+        document.getElementById('bulanFilter');
+
+    const tahunSelect =
+        document.getElementById('tahunFilter');
+
+    bulanNama.forEach((bulan,index)=>{
+
+        bulanSelect.innerHTML += `
+        <option value="${index+1}">
+            ${bulan}
+        </option>
+        `;
+
+    });
+
+    const tahunSet =
+        [...new Set(
+            semuaData.map(item => {
+
+                const t =
+                    new Date(item.Tanggal);
+
+                return t.getFullYear();
+
+            })
+        )];
+
+    tahunSet.sort();
+
+    tahunSet.forEach(tahun => {
+
+        tahunSelect.innerHTML += `
+        <option value="${tahun}">
+            ${tahun}
+        </option>
+        `;
+
+    });
+
+    const sekarang = new Date();
+
+    bulanSelect.value =
+        sekarang.getMonth() + 1;
+
+    tahunSelect.value =
+        sekarang.getFullYear();
+
+    bulanSelect.addEventListener(
+        'change',
+        render
+    );
+
+    tahunSelect.addEventListener(
+        'change',
+        render
+    );
+
+}
+
+function render(){
+
+    const bulan =
+        Number(
+            document.getElementById(
+                'bulanFilter'
+            ).value
+        );
+
+    const tahun =
+        Number(
+            document.getElementById(
+                'tahunFilter'
+            ).value
+        );
+
+    const data =
+        semuaData.filter(item => {
+
+            const t =
+                new Date(item.Tanggal);
+
+            return (
+                t.getMonth() + 1 === bulan &&
+                t.getFullYear() === tahun
+            );
+
+        });
+
+    let totalMasuk = 0;
+    let totalKeluar = 0;
+
+    const kategori = {};
+
+    data.forEach(item => {
+
+        const nominal =
+            Number(item.Nominal);
+
+        if(item.Jenis === 'Masuk'){
+
+            totalMasuk += nominal;
+
+        }else{
+
+            totalKeluar += nominal;
+
+            kategori[item.Kategori] =
+                (kategori[item.Kategori] || 0)
+                + nominal;
+
+        }
+
+    });
+
+    document.getElementById(
+        'totalMasuk'
+    ).innerText =
+    rupiah(totalMasuk);
+
+    document.getElementById(
+        'totalKeluar'
+    ).innerText =
+    rupiah(totalKeluar);
+
+    document.getElementById(
+        'saldo'
+    ).innerText =
+    rupiah(totalMasuk - totalKeluar);
+
+    const kategoriUrut =
+        Object.entries(kategori)
+        .sort((a,b)=>b[1]-a[1]);
+
+    let kategoriHTML = '';
+
+    kategoriUrut.forEach(
+        ([nama,jumlah]) => {
+
+        kategoriHTML += `
+        <div class="ranking-item">
+            <span>${nama}</span>
+            <strong>
+                ${rupiah(jumlah)}
+            </strong>
+        </div>
+        `;
+
+    });
+
+    document.getElementById(
+        'kategoriList'
+    ).innerHTML =
+    kategoriHTML || 'Tidak ada data';
+
+    const terbesar =
+        kategoriUrut[0];
+
+    const hariUnik =
+        [...new Set(
+            data
+            .filter(
+                x => x.Jenis === 'Keluar'
+            )
+            .map(x => x.Tanggal)
+        )];
+
+    const rataRata =
+        hariUnik.length
+        ? totalKeluar /
+          hariUnik.length
+        : 0;
+
+    document.getElementById(
+        'statistik'
+    ).innerHTML = `
+    <div class="ranking-item">
+        <span>
+            Pengeluaran Terbesar
+        </span>
+        <strong>
+            ${
+                terbesar
+                ? terbesar[0]
+                  + ' - '
+                  + rupiah(
+                        terbesar[1]
+                    )
+                : '-'
+            }
+        </strong>
+    </div>
+
+    <div class="ranking-item">
+        <span>
+            Pengeluaran Harian Rata-rata
+        </span>
+        <strong>
+            ${rupiah(rataRata)}
+        </strong>
+    </div>
+    `;
+
+    const tbody =
+        document.querySelector(
+            '#transaksiTable tbody'
+        );
+
+    tbody.innerHTML = '';
+
+    data
+    .sort(
+        (a,b)=>
+        new Date(b.Tanggal)
+        -
+        new Date(a.Tanggal)
+    )
+    .forEach(item => {
+
+        tbody.innerHTML += `
+        <tr class="${
+            item.Jenis === 'Masuk'
+            ? 'masuk'
+            : 'keluar'
+        }">
+
+            <td>${item.Tanggal}</td>
+
+            <td>${item.Jenis}</td>
+
+            <td>${item.Kategori}</td>
+
+            <td>${item.Keterangan}</td>
+
+            <td>
+                ${rupiah(item.Nominal)}
+            </td>
+
+        </tr>
+        `;
+
+    });
+
+}
+
+</script>
 </body>
 </html>
