@@ -764,7 +764,56 @@ for(let i = 2; i >= 0; i--){
     });
 
 }
-    
+    const ctxBulan =
+    document.getElementById(
+        'bulanChart'
+    );
+
+if(bulanChart){
+
+    bulanChart.destroy();
+
+}
+
+bulanChart =
+new Chart(ctxBulan, {
+
+    type:'bar',
+
+    data:{
+
+        labels:
+            data3Bulan.map(
+                x => x.bulan
+            ),
+
+        datasets:[
+
+            {
+                label:'Pemasukan',
+                data:
+                    data3Bulan.map(
+                        x => x.masuk
+                    )
+            },
+
+            {
+                label:'Pengeluaran',
+                data:
+                    data3Bulan.map(
+                        x => x.keluar
+                    )
+            }
+
+        ]
+
+    },
+
+    options:{
+        responsive:true
+    }
+
+});
 }
 
 </script>
