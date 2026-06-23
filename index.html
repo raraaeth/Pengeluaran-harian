@@ -136,8 +136,8 @@ tr.keluar{
 
 <h1>💰 Dashboard Keuangan</h1>
 
-<div class="filters">
-    <div class="section">
+
+ <div class="section">
 
 <h2>📅 Minggu Ini</h2>
 
@@ -167,7 +167,7 @@ Rp0
 
     </div>
     
-
+<div class="filters">
 <select id="bulanFilter"></select>
 
 <select id="tahunFilter"></select>
@@ -385,8 +385,7 @@ kategoriSet.forEach(k => {
 
 function render(){
 
-    const bulan =
-        const hariIni = new Date();
+ const hariIni = new Date();
 
 const tujuhHariLalu = new Date();
 
@@ -406,6 +405,7 @@ const dataMingguan =
         );
 
     });
+    const bulan =
         Number(
             document.getElementById(
                 'bulanFilter'
