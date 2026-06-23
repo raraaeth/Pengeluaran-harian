@@ -755,16 +755,19 @@ for(let i = 2; i >= 0; i--){
 
     data3Bulan.push({
 
-        bulan:
-            bulanNama[bulanCari],
+    bulan:
+        bulanNama[bulanCari],
 
-        masuk,
-        keluar
+    masuk,
+    keluar
 
-    });
+});
 
 }
-    const ctxBulan =
+
+// Buat grafik 3 bulan
+
+const ctxBulan =
     document.getElementById(
         'bulanChart'
     );
@@ -814,6 +817,7 @@ new Chart(ctxBulan, {
     }
 
 });
+
 }
 
 </script>
