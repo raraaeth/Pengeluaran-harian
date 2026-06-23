@@ -256,6 +256,13 @@ Loading...
 </div>
 
 </div>
+    <div class="section">
+
+<h2>📈 Perbandingan 3 Bulan Terakhir</h2>
+
+<canvas id="bulanChart"></canvas>
+
+    </div>
 
 </div>
 
@@ -270,6 +277,7 @@ function rupiah(n){
 
 let semuaData = [];
 let kategoriChart = null;
+let bulanChart = null;
 
 const bulanNama = [
     'Januari',
@@ -697,6 +705,66 @@ new Chart(ctx, {
 
     });
 
+        const data3Bulan = [];
+
+for(let i = 2; i >= 0; i--){
+
+    const d = new Date();
+
+    d.setMonth(
+        d.getMonth() - i
+    );
+
+    const bulanCari =
+        d.getMonth();
+
+    const tahunCari =
+        d.getFullYear();
+
+    let masuk = 0;
+    let keluar = 0;
+
+    semuaData.forEach(item => {
+
+        const t =
+            new Date(item.Tanggal);
+
+        if(
+            t.getMonth() === bulanCari &&
+            t.getFullYear() === tahunCari
+        ){
+
+            const nominal =
+                Number(item.Nominal);
+
+            if(
+                item.Jenis === 'Masuk'
+            ){
+
+                masuk += nominal;
+
+            }else{
+
+                keluar += nominal;
+
+            }
+
+        }
+
+    });
+
+    data3Bulan.push({
+
+        bulan:
+            bulanNama[bulanCari],
+
+        masuk,
+        keluar
+
+    });
+
+}
+    
 }
 
 </script>
